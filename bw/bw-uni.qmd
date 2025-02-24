@@ -3,3 +3,16 @@ title: "Univariate Viz"
 ---
 
 Use this file to generate a professional looking **univariate** visualization. The visualization will not perfect the first time but you are expected to improve on it throughout the semester especially after covering advanced topics such as effective viz.
+
+```{r}
+# Import data
+hikes <- read.csv("https://mac-stat.github.io/data/high_peaks.csv")
+library(ggplot2)
+```
+
+```{r}
+ggplot(hikes, aes(x = elevation)) +
+  geom_histogram(color = "orange")  +
+  theme_minimal()
+```
+
