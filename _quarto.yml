@@ -30,6 +30,8 @@ book:
       - bw/bw-tri.qmd
       - bw/bw-quad.qmd
       - bw/bw-spatial.qmd
+      - bw/Solo project.qmd
+      - bw/stock market fluctuation.qmd
 
     - part: "In-class Activities"
       chapters: 
@@ -37,7 +39,15 @@ book:
       - ica/ica-bi.qmd
       - ica/ica-multi.qmd
       - ica/ica-spatial.qmd
+      - ica/ica-effective.qmd
       - ica/ica-wrangling.qmd
+      - ica/ica-dates.qmd
+      - ica/ica-joining.qmd
+      - ica/ica-factors.qmd
+      - ica/ica-strings.qmd
+      - ica/ica-data import.qmd
+      - ica/ica-EDA.qmd
+
 
 format:
   html:

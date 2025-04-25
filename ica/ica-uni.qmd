@@ -44,16 +44,22 @@ library(ggplot2)
 
 ::: {.callout-warning title="Discussion"}
 
-1. What is the pattern / trend of `elevation` of hiking trails?
+1. What is the pattern / trend of `elevation` of hiking trails? 
 2. What is the relationship between a hike's `elevation` and typical `time` it takes to summit / reach the top?
 
 ```{r}
+# first look
 head(hikes)
+
+# visualization
 ggplot(hikes, aes(x = elevation)) + 
-  geom_density()
+  geom_density() +
+  theme_minimal()
+
 ggplot(hikes, aes(x = time, y = elevation)) + 
   geom_point() +
-  geom_smooth()
+  geom_smooth() +
+  theme_minimal()
 ```
 
 :::
@@ -184,12 +190,17 @@ head(hikes)
 
 a.  What features would we like a visualization of the *categorical* difficulty `rating` variable to capture?
 
-It contains different kind of information that we may need to convert it to numerical variables to capture the trend.
+The categorical variable `rating` contains different kind of info whose trend would be hard to directly exhibit. \r\n
+We want the visualization to capture: \r\n
+   - The number of hikes in each difficulty category 
+   - The difficult level distribution pattern in the ordinal way
 
 b.  What about a visualization of the *quantitative* `elevation` variable?
 
-it is smoother.
-
+ For the *quantitative* `elevation` variable, we want the visualization to capture: \r\n
+   - Show the overall distribution of elevation values
+   - Reveal any overall trend in the data
+   
 ### Exercise 2: Load tidyverse {.unnumbered}
 
 We'll address the above questions using `ggplot` tools. Try running the following chunk and simply take note of the error message -- this is one you'll get a lot!
@@ -222,6 +233,7 @@ All of these questions can be answered with: (1) a **bar chart**; of (2) the *ca
 
 ```{r}
 ggplot(hikes, aes(x = rating))
+
 ```
 
 Think about:
@@ -285,9 +297,16 @@ ggplot(hikes, aes(x = rating)) +
 Reflect on the `ggplot()` code.
 
 -   What's the purpose of the `+`? When do we use it?
+    **Answer:** The `+` operator is used to add  a new component or layer to our visualization.
+
 -   We added the bars using `geom_bar()`? Why "geom"?
+   **Answer:** "geom" means "geometric object", "geom" functions are used for visualizations.
+   
 -   What does `labs()` stand for?
+    **Answer:** "labs()" means "labels".
+    
 -   What's the difference between `color` and `fill`?
+    **Answer:** `color` means the borderline colors of graphic components while `fill`means the filling color of the graphic object.
 
 #### Part b {.unnumbered}
 
@@ -298,13 +317,13 @@ In general, bar charts allow us to examine the following properties of a *catego
 
 We must then *translate* this information into the *context* of our analysis, here hikes in the Adirondacks. Summarize below what you learned from the bar chart, in context.
 
-there are 3 levels of ratings: difficult, easy, and moderate; there are very few hikes rated as difficult and most of them are rated as moderate. 
+**Answer:** The difficulty ratings for hikes in the Adirondacks fall into three observed categories: difficult, easy, and moderate. Most hikes are rated as moderate, indicating that they are of average challenge level. Very few hikes are rated as difficult, suggesting that extreme hikes are relatively rare. 
 
 #### Part c {.unnumbered}
 
 Is there anything you don't like about this barplot? For example: check out the x-axis again.
 
-it does not contain the information of the specfic number of hikes for each level of rating. 
+**Answer:** It does not contain the information of the specfic number of hikes for each level of rating. 
 
 
 ### Exercise 6: Sad Bar Chart {.unnumbered}
@@ -320,7 +339,7 @@ Here:
 -   Construct a **bar chart** of the *quantitative* `elevation` variable.
 -   Explain why this might *not* be an effective visualization for this and other quantitative variables. (What questions does / doesn't it help answer?)
 
-too many bars
+**Explaination:** There are too many bars scattering, and thus the overall trend is not well presented.
 
 ```{r}
 ggplot(hikes, aes(x = elevation)) +
@@ -353,8 +372,10 @@ ggplot(hikes, aes(x = elevation)) +
 
 Let's dig into some details.
 
--   How many hikes have an elevation between 4500 and 4700 feet? 6
--   How many total hikes have an elevation of at least 5100 feet? 2
+-   How many hikes have an elevation between 4500 and 4700 feet? 
+**Answer:** 6
+-   How many total hikes have an elevation of at least 5100 feet? 
+**Answer:** 2
 
 #### Part b {.unnumbered}
 
@@ -367,7 +388,12 @@ Now the bigger picture. In general, histograms allow us to examine the following
 
 We must then *translate* this information into the *context* of our analysis, here hikes in the Adirondacks. Addressing each of the features in the above list, summarize below what you learned from the histogram, in context.
 
-hikes from 3700-5700. the center of datapoints is 4500. a outcome between 4000-5000 is typical. left-skewed. there are some outliners. 
+**Answer:**
+-   **typical outcome:**The center of the data points is 4500 and a outcome between 4000-5000 is typical.
+-   **variability & range:** The range of elevations vary from 3700 to 5700.
+-   **shape:** The distribution is left-skewed.
+-   **outliers:** There are some outliners. 
+
 
 ### Exercise 8: Building Histograms - Part 1 {.unnumbered}
 
@@ -384,46 +410,66 @@ ggplot(hikes, aes(x = elevation)) +
 Let's build some histograms. Try each chunk below, *one by one*. In each chunk, make a comment about how both the code and the corresponding plot both changed.
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# add labels
 ggplot(hikes, aes(x = elevation)) +
-  geom_histogram()
+  geom_histogram() + 
+  labs(
+    title = "Distribution of Mountain Elevations",
+    x = "Elevation (feet)",
+    y = "Count"
+  ) 
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# change the borderline color to white
 ggplot(hikes, aes(x = elevation)) +
-  geom_histogram(color = "white") 
+  geom_histogram(color = "white")  + 
+  labs(
+    title = "Distribution of Mountain Elevations",
+    x = "Elevation (feet)",
+    y = "Count"
+  ) 
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# change the filling color to blue
 ggplot(hikes, aes(x = elevation)) +
-  geom_histogram(color = "white", fill = "blue") 
+  geom_histogram(color = "white",fill = "blue")  + 
+  labs(
+    title = "Distribution of Mountain Elevations",
+    x = "Elevation (feet)",
+    y = "Count"
+  ) 
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# change the theme to classic
 ggplot(hikes, aes(x = elevation)) +
-  geom_histogram(color = "white") +
-  labs(x = "Elevation (feet)", y = "Number of hikes")
+  geom_histogram(color = "white",fill = "blue")  + 
+  labs(
+    title = "Distribution of Mountain Elevations",
+    x = "Elevation (feet)",
+    y = "Count"
+  ) +
+  theme_classic()
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# Changed binwidth to 1000 feet
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", binwidth = 1000) +
   labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# Changed binwidth to 5 feet 
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", binwidth = 5) +
   labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# Changed binwidth to 200 feet
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", binwidth = 200) +
   labs(x = "Elevation (feet)", y = "Number of hikes")
@@ -432,12 +478,23 @@ ggplot(hikes, aes(x = elevation)) +
 
 ### Exercise 10: Histogram Follow-up {.unnumbered}
 
--   What function added the histogram layer / geometry? 
--   What's the difference between `color` and `fill`? color  fill-the bar color; color-the bar outlines
--   Why does adding `color = "white"` improve the visualization? easier to see when it has white lines
--   What did `binwidth` do? defines the width of each bar
--   Why does the histogram become ineffective if the `binwidth` is too big (e.g. 1000 feet)? the graph has limited space
--   Why does the histogram become ineffective if the `binwidth` is too small (e.g. 5 feet)? it is hard to see it clearly
+- What function added the histogram layer / geometry?  
+  **Answer:** The function `geom_histogram()` adds the histogram layer to the plot -- tells `ggplot` to visualize the distribution of a numeric variable using bars.
+
+- What's the difference between `color` and `fill`?  
+  **Answer:** `fill` controls the filling color of the bars, while `color` controls the border of each bar.
+
+- Why does adding `color = "white"` improve the visualization?  
+  **Answer:** Adding `color = "white"` creates clear separation between adjacent bars and thus increase its accountability.
+
+- What did `binwidth` do?  
+  **Answer:** The `binwidth` argument defines the width of each bar in the histogram -- how the continuous variable is grouped.
+
+- Why does the histogram become ineffective if the `binwidth` is too big (e.g., 1000 feet)?  
+  **Answer:** If the binwidth is too large, too many values are grouped together, which limits the variation in the data and makes the distribution look overly simplified or flat.
+
+- Why does the histogram become ineffective if the `binwidth` is too small (e.g., 5 feet)?  
+  **Answer:** If the binwidth is too small, the plot becomes "noisy", making it hard to see overall trends in the data.
 
 
 ### Exercise 11: Density Plots {.unnumbered}
@@ -461,17 +518,41 @@ ggplot(hikes, aes(x = elevation)) +
 -   TRY IT! Test out those lines in the chunk below. Was your intuition correct?
 
 ```{r}
+# color blue
+ggplot(hikes, aes(x = elevation)) +
+  geom_density(color = "blue")
+
+# fill orange
+ggplot(hikes, aes(x = elevation)) +
+  geom_density(fill = "orange")
 ```
 
 -   Examine the density plot. How does it compare to the histogram? What does it tell you about the *typical* elevation, *variability / range* in elevations, and *shape* of the distribution of *elevations* within this range?
 
+**Answer:** The density plot provides a smoother and more continuous view of the distribution compared to the histogram. While the histogram groups data into discrete bins, the density plot estimates the probability density function, showing a general trend without being affected by bin width choices. The peak of the curves is around 4200 feets, which means the most typical outcome is 4200. The range of elevations spans roughly from 3600 to 5400 feet, indicating a spread of nearly 2000 feet. The distribution is right-skewed, suggesting there are more hikes with lower to mid elevations, and fewer hikes with very high elevations.
 
 
 ### Exercise 12: Density Plots vs Histograms {.unnumbered}
 
 The histogram and density plot both allow us to visualize the behavior of a quantitative variable: typical outcome, variability / range, shape, and outliers. What are the pros/cons of each? What do you like/not like about each?
 
+**Answer:**
 
+**Histogram**  
+***Pros:***
+  - Easy to interpret
+  - Directly shows counts
+  - Great for detecting outliers or gaps in the data if on the choice of bin width is small enough
+***Cons:***
+  -  Binned nature may obscure overall trends or give confusing results
+  
+**Density Plot**  
+***Pros:***
+  - Smooth curve gives a clearer sense 
+  - No need to tune the bin width
+***Cons:***
+  - Do not exhibit the number of data points
+  
 ### Exercise 13: Code = communication {.unnumbered}
 
 We *obviously* won't be done until we talk about communication. All code above has a similar *general* structure (where the details can change):
@@ -486,6 +567,8 @@ ggplot(___, aes(x = ___)) +
 
 -   Though not *necessary* to the code working, it's common, good practice to *indent* or *tab* the lines of code after the first line (counterexample below). Why?
 
+**Answer:** It makes the code more visually organized and thus useful for future reference. 
+
 ```{r}
 # YUCK
 ggplot(hikes, aes(x = elevation)) +
@@ -494,6 +577,8 @@ labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
 -   Though not *necessary* to the code working, it's common, good practice to put a *line break* after each `+` (counterexample below). Why?
+
+**Answer:** It makes the code more visually organized and thus useful for future reference. 
 
 ```{r}
 # YUCK 

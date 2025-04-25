@@ -1,0 +1,278 @@
+---
+title: "stock market fluctuation"
+format: html
+---
+
+description:
+This section contains some extra work Phoebe did for fun. 
+\r\n
+source:
+https://www.kaggle.com/datasets/zongaobian/netflix-stock-data-and-key-affiliated-companies?resource=download
+\r\n
+https://www.kaggle.com/datasets/kirolosatef/netflex-stock-dataset-with-twitter-sentiment?select=Ntweets.xlsx
+\r\n
+```{r}
+library(tidymodels)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(zoo)
+library(scales)
+library(tibble)
+library(stringr)
+```
+
+
+```{r}
+# data imports
+
+WBD_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/WBD_daily_data.csv")
+
+V_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/V_daily_data.csv")
+
+UPS_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/UPS_daily_data.csv")
+
+SONY_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/SONY_daily_data.csv")
+
+PARA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/PARA_daily_data.csv")
+
+NVDA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/NVDA_daily_data.csv")
+
+NFLX_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/NFLX_daily_data.csv")
+
+MA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/MA_daily_data.csv")
+
+LUMN_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/LUMN_daily_data.csv")
+
+INTC_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/INTC_daily_data.csv")
+
+FDX_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/FDX_daily_data.csv")
+
+CRM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/CRM_daily_data.csv")
+
+AMZN_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/AMZN_daily_data.csv")
+
+AKAM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/AKAM_daily_data.csv")
+
+data_twitter_sentiment<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/twitter sentiments/data_2018-2022.csv")
+```
+```{r}
+event_df <- tibble::tibble(
+  date = as.Date(c(
+    "2020-11-12",  # Sony PS5 launch
+    "2021-05-17" # WarnerMedia–Discovery merger news
+  )),
+  event = c(
+    "Sony PS5 global launch (gaming boom)",
+    "WarnerMedia–Discovery merger announced"
+  ),
+  affected_companies = c(
+    "SONY", # New Gaming Station launch
+    "WBD" #  Corporate structure change
+  )
+)
+```
+
+
+```{r}
+# specify the time span
+data_twitter_sentiment %>%
+  summarize(
+    min_date = min(date),
+    max_date = max(date)
+  )
+```
+
+```{r}
+# data cleaning: adjust time span
+filter_stock_data <- function(data) {
+    data %>% 
+    mutate(Date = as.Date(Date)) %>%
+    filter(Date >= as.Date("2018-01-02") & Date <= as.Date("2022-07-08"))
+}
+
+WBD_stock  <- filter_stock_data(WBD_stock)
+V_stock    <- filter_stock_data(V_stock)
+UPS_stock  <- filter_stock_data(UPS_stock)
+SONY_stock <- filter_stock_data(SONY_stock)
+PARA_stock <- filter_stock_data(PARA_stock)
+NVDA_stock <- filter_stock_data(NVDA_stock)
+NFLX_stock <- filter_stock_data(NFLX_stock)
+MA_stock   <- filter_stock_data(MA_stock)
+LUMN_stock <- filter_stock_data(LUMN_stock)
+INTC_stock <- filter_stock_data(INTC_stock)
+FDX_stock  <- filter_stock_data(FDX_stock)
+CRM_stock  <- filter_stock_data(CRM_stock)
+AMZN_stock <- filter_stock_data(AMZN_stock)
+AKAM_stock <- filter_stock_data(AKAM_stock)
+```
+
+
+```{r}
+# data cleaning: combine the stock data
+normalize_and_label <- function(df, ticker) {
+  df %>%
+    mutate(
+      Date = as.Date(Date),
+      normalized = `Adj Close` / first(`Adj Close`),
+      symbol = ticker
+    )
+}
+
+all_stocks <- bind_rows(
+  normalize_and_label(WBD_stock,  "WBD"),
+  normalize_and_label(V_stock,    "V"),
+  normalize_and_label(UPS_stock,  "UPS"),
+  normalize_and_label(SONY_stock, "SONY"),
+  normalize_and_label(PARA_stock, "PARA"),
+  normalize_and_label(NVDA_stock, "NVDA"),
+  normalize_and_label(NFLX_stock, "NFLX"),
+  normalize_and_label(MA_stock,   "MA"),
+  normalize_and_label(LUMN_stock, "LUMN"),
+  normalize_and_label(INTC_stock, "INTC"),
+  normalize_and_label(FDX_stock,  "FDX"),
+  normalize_and_label(CRM_stock,  "CRM"),
+  normalize_and_label(AMZN_stock, "AMZN"),
+  normalize_and_label(AKAM_stock, "AKAM")
+)
+```
+
+```{r}
+# data description
+company_info <- tribble(
+  ~Company_Name,              ~Ticker, ~Sector,
+  "Warner Bros. Discovery",   "WBD",   "Media & Entertainment",
+  "Visa Inc.",                "V",     "Financial Services",
+  "United Parcel Service",    "UPS",   "Logistics",
+  "Sony Group Corporation",   "SONY",  "Consumer Electronics & Entertainment",
+  "Paramount Global",         "PARA",  "Media & Entertainment",
+  "NVIDIA Corporation",       "NVDA",  "Semiconductors",
+  "Netflix Inc.",             "NFLX",  "Streaming Media",
+  "Mastercard Inc.",          "MA",    "Financial Services",
+  "Lumen Technologies",       "LUMN",  "Telecommunications",
+  "Intel Corporation",        "INTC",  "Semiconductors",
+  "FedEx Corporation",        "FDX",   "Logistics",
+  "Salesforce Inc.",          "CRM",   "Enterprise Software",
+  "Amazon.com Inc.",          "AMZN",  "E-Commerce & Cloud",
+  "Akamai Technologies",      "AKAM",  "Cloud & Cybersecurity"
+)
+
+company_info
+```
+
+```{r}
+ggplot(all_stocks, aes(x = Date, y = normalized, color = symbol)) +
+  geom_line(size = 0.4) +
+  labs(title = "Normalized Stock Price Trends (2018–2022)",
+       y = "Normalized Price",
+       x = "Date") +
+  theme_minimal()
+```
+
+
+```{r}
+calc_returns_volatility <- function(stock, ticker) {
+  stock %>%
+    arrange(Date) %>%
+    mutate(
+      log_return = log(`Adj Close` / lag(`Adj Close`)),
+      vol_30d = rollapply(log_return, 30, sd, fill = NA, align = "right"),
+      symbol = ticker
+    )
+}
+
+tech_stock_data <- bind_rows(
+  calc_returns_volatility(NFLX_stock, "NFLX"),
+  calc_returns_volatility(AMZN_stock, "AMZN"),
+  calc_returns_volatility(INTC_stock, "INTC")
+)
+
+ggplot(tech_stock_data, aes(x = Date, y = vol_30d, color = symbol)) +
+  geom_line() +
+  labs(title = "30-Day Rolling Volatility: NFLX vs AMZN vs INTC",
+       y = "Volatility",
+       x = "Date") +
+  theme_minimal()
+
+ggplot(tech_stock_data, aes(x = Date, y = log_return, color = symbol,alpha =0.3)) +
+  geom_line() +
+  labs(title = "log return: NFLX vs AMZN vs INTC",
+       y = "log return",
+       x = "Date") +
+  theme_minimal()
+```
+
+
+```{r}
+ggplot(data_twitter_sentiment, aes(x = date)) +
+  geom_line(aes(y = rescale(Volume, to = c(0,1),size = 0.2)), color = "blue") +
+  geom_line(aes(y = rescale(twt_count, to = c(0,1),size = 0.2)), color = "pink") +
+  labs(title = "Netflix Stock Transaction Volume vs Twitter Counts (Rescaled)",
+       y = "Rescaled Value",
+       x = "Date") +
+  theme_minimal()
+```
+
+```{r}
+sony_event <- event_df[1, ]
+sony_data <- SONY_stock %>%
+  mutate(Date = as.Date(Date)) %>%
+  arrange(Date) %>%
+  mutate(
+    log_return = log(`Adj Close` / lag(`Adj Close`)),
+    vol_30d = rollapply(log_return, 30, sd, fill = NA)
+  ) %>%
+  filter(Date >= sony_event$date - 10 & Date <= sony_event$date + 10)
+
+# Close Price
+ggplot(sony_data, aes(x = Date, y = Close)) +
+  geom_line(color = "steelblue") +
+  geom_vline(xintercept = as.numeric(sony_event$date), linetype = "dashed", color = "red") +
+  labs(title = "SONY Close Price around PS5 Launch", y = "Close Price")
+
+# Log Return
+ggplot(sony_data, aes(x = Date, y = log_return)) +
+  geom_line(color = "purple") +
+  geom_vline(xintercept = as.numeric(sony_event$date), linetype = "dashed", color = "red") +
+  labs(title = "SONY Log Return around PS5 Launch", y = "Log Return")
+
+# Volatility
+ggplot(sony_data, aes(x = Date, y = vol_30d)) +
+  geom_line(color = "darkorange") +
+  geom_vline(xintercept = as.numeric(sony_event$date), linetype = "dashed", color = "red") +
+  labs(title = "SONY 30-Day Volatility around PS5 Launch", y = "Volatility")
+
+```
+
+```{r}
+wbd_event <- event_df[2, ]
+wbd_data <- WBD_stock %>%
+  mutate(Date = as.Date(Date)) %>%
+  arrange(Date) %>%
+  mutate(
+    log_return = log(`Adj Close` / lag(`Adj Close`)),
+    vol_30d = rollapply(log_return, 30, sd, fill = NA, align = "right")
+  ) %>%
+  filter(Date >= wbd_event$date - 10 & Date <= wbd_event$date + 10)
+
+# Close Price
+ggplot(wbd_data, aes(x = Date, y = Close)) +
+  geom_line(color = "steelblue") +
+  geom_vline(xintercept = as.numeric(wbd_event$date), linetype = "dashed", color = "red") +
+  labs(title = "WBD Close Price around Merger Announcement", y = "Close Price")
+
+# Log Return
+ggplot(wbd_data, aes(x = Date, y = log_return)) +
+  geom_line(color = "purple") +
+  geom_vline(xintercept = as.numeric(wbd_event$date), linetype = "dashed", color = "red") +
+  labs(title = "WBD Log Return around Merger Announcement", y = "Log Return")
+
+# Volatility
+ggplot(wbd_data, aes(x = Date, y = vol_30d)) +
+  geom_line(color = "darkorange") +
+  geom_vline(xintercept = as.numeric(wbd_event$date), linetype = "dashed", color = "red") +
+  labs(title = "WBD 30-Day Volatility around Merger Announcement", y = "Volatility")
+
+```
+

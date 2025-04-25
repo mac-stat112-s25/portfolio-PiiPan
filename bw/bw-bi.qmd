@@ -6,14 +6,129 @@ Use this file to generate a professional looking **bivariate** visualization.  T
 
 ```{r}
 library(ggplot2)
+library(readr)
+library(tidymodels)
+library(tidyverse)
 ```
 
 ```{r}
 elections <- read.csv("https://mac-stat.github.io/data/election_2020_county.csv")
+weather <- read.csv("https://mac-stat.github.io/data/weather_3_locations.csv")
 ```
 
 ```{r}
 ggplot(elections, aes(x = historical, fill = winner_20)) +
-  geom_bar(position = "fill")
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = c("skyblue", "pink")) +
+  labs(
+    title = "Proportion of 2020 Winners by Historical State Voting Pattern",
+    x = "Historical Voting Trend",
+    y = "Proportion of Counties",
+    fill = "2020 Winner"
+  ) +
+  theme_minimal()
+```
+```{r}
+ggplot(weather, aes(x = temp3pm, fill = location)) +
+  geom_density(alpha = 0.5) +
+  labs(
+    title = "Distribution of 3PM Temperatures by Location",
+    x = "Temperature at 3PM (°C)",
+    y = "Density",
+    fill = "Location"
+  ) +
+  theme_minimal()
+
+```
+
+```{r echo = FALSE}
+# data imports
+
+WBD_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/WBD_daily_data.csv")
+
+V_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/V_daily_data.csv")
+
+UPS_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/UPS_daily_data.csv")
+
+SONY_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/SONY_daily_data.csv")
+
+PARA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/PARA_daily_data.csv")
+
+NVDA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/NVDA_daily_data.csv")
+
+NFLX_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/NFLX_daily_data.csv")
+
+MA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/MA_daily_data.csv")
+
+LUMN_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/LUMN_daily_data.csv")
+
+INTC_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/INTC_daily_data.csv")
+
+FDX_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/FDX_daily_data.csv")
+
+CRM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/CRM_daily_data.csv")
+
+AMZN_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/AMZN_daily_data.csv")
+
+AKAM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/AKAM_daily_data.csv")
+
+data_twitter_sentiment<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/twitter sentiments/data_2018-2022.csv")
+# data cleaning: adjust time span
+filter_stock_data <- function(data) {
+    data %>% 
+    mutate(Date = as.Date(Date)) %>%
+    filter(Date >= as.Date("2018-01-02") & Date <= as.Date("2022-07-08"))
+}
+
+WBD_stock  <- filter_stock_data(WBD_stock)
+V_stock    <- filter_stock_data(V_stock)
+UPS_stock  <- filter_stock_data(UPS_stock)
+SONY_stock <- filter_stock_data(SONY_stock)
+PARA_stock <- filter_stock_data(PARA_stock)
+NVDA_stock <- filter_stock_data(NVDA_stock)
+NFLX_stock <- filter_stock_data(NFLX_stock)
+MA_stock   <- filter_stock_data(MA_stock)
+LUMN_stock <- filter_stock_data(LUMN_stock)
+INTC_stock <- filter_stock_data(INTC_stock)
+FDX_stock  <- filter_stock_data(FDX_stock)
+CRM_stock  <- filter_stock_data(CRM_stock)
+AMZN_stock <- filter_stock_data(AMZN_stock)
+AKAM_stock <- filter_stock_data(AKAM_stock)
+# data cleaning: combine the stock data
+normalize_and_label <- function(df, ticker) {
+  df %>%
+    mutate(
+      Date = as.Date(Date),
+      normalized = `Adj Close` / first(`Adj Close`),
+      symbol = ticker
+    )
+}
+
+all_stocks <- bind_rows(
+  normalize_and_label(WBD_stock,  "WBD"),
+  normalize_and_label(V_stock,    "V"),
+  normalize_and_label(UPS_stock,  "UPS"),
+  normalize_and_label(SONY_stock, "SONY"),
+  normalize_and_label(PARA_stock, "PARA"),
+  normalize_and_label(NVDA_stock, "NVDA"),
+  normalize_and_label(NFLX_stock, "NFLX"),
+  normalize_and_label(MA_stock,   "MA"),
+  normalize_and_label(LUMN_stock, "LUMN"),
+  normalize_and_label(INTC_stock, "INTC"),
+  normalize_and_label(FDX_stock,  "FDX"),
+  normalize_and_label(CRM_stock,  "CRM"),
+  normalize_and_label(AMZN_stock, "AMZN"),
+  normalize_and_label(AKAM_stock, "AKAM")
+)
+```
+
+
+```{r}
+ggplot(all_stocks, aes(x = Date, y = normalized, color = symbol)) +
+  geom_line(size = 0.4) +
+  labs(title = "Normalized Stock Price Trends (2018–2022)",
+       y = "Normalized Price",
+       x = "Date") +
+  theme_minimal()
 ```
 

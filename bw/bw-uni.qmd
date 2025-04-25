@@ -6,13 +6,41 @@ Use this file to generate a professional looking **univariate** visualization. T
 
 ```{r}
 # Import data
-hikes <- read.csv("https://mac-stat.github.io/data/high_peaks.csv")
+# Used student survey data from ICA
+survey <- read.csv("https://hash-mac.github.io/stat112site-s25/data/survey.csv")
 library(ggplot2)
+library(tidyverse)
 ```
 
 ```{r}
-ggplot(hikes, aes(x = elevation)) +
-  geom_histogram(color = "orange")  +
+ggplot(survey, aes(x = hangout)) +
+  geom_bar(fill = "mediumseagreen", color = "grey") +
+  labs(
+    title = "Where Students Prefer to Hang Out Outdoors",
+    x = "Location",
+    y = "Number of Students"
+  ) +
   theme_minimal()
 ```
+```{r}
+ggplot(survey, aes(x = fav_temp_c)) +
+  geom_histogram(binwidth = 2, fill = "coral", color = "white") +
+  labs(
+    title = "Distribution of Preferred Outdoor Temperature",
+    x = "Preferred Temperature (°C)",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+ggplot(survey, aes(x = fav_temp_c)) +
+  geom_density(fill = "coral", alpha = 0.5) +
+  labs(title = "Density of Student Temperature Preferences",
+       x = "Preferred Temperature (°C)",
+       y = "Density") +
+  theme_minimal()
+```
+
 
