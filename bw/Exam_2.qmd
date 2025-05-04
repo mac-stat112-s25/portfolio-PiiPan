@@ -1,0 +1,71 @@
+---
+title: "Exam_2"
+author: Phoebe Pan
+date: 4/24/2025
+format: html
+---
+```{r, message=FALSE,warning=FALSE,echo=FALSE}
+library(tidytuesdayR)
+library(tidyverse)
+library(ggplot2)
+library(rnaturalearth)
+library(dplyr)
+library(sf)
+```
+
+### Data
+
+**food_consumption.csv**
+
+| variable      | class     | description                       |
+|---------------|-----------|-----------------------------------|
+| country       | character | Country Name                      |
+| food_category | character | Food Category                     |
+| consumption   | double    | Consumption (kg/person/year)      |
+| co2_emmission | double    | CO2 Emission (kg CO2/person/year) |
+
+
+```{r,echo = FALSE}
+#| message: false
+#| warning: false
+tuesdata <- tt_load('2020-02-18')
+fc <- tuesdata$food_consumption
+```
+
+## Research Question: Which 5 countries consume the most food?
+
+```{r}
+top_consumers <- fc %>%
+  group_by(country) %>%
+  summarize(total_consumption = sum(consumption, na.rm = TRUE)) %>%
+  arrange(desc(total_consumption)) %>%
+  slice_head(n = 5)
+
+top_consumers
+```
+The table clearly identifies the top five countries with the highest total food consumption (measured in kg/person/year). Finland ranks first with 639.8 kg/person/year, followed by Lithuania, Sweden, the Netherlands, and Albania. 
+
+```{r fig.width=10, fig.height=10}
+fc_country <- fc %>%
+  group_by(country) %>%
+  summarise(
+    total_consumption = sum(consumption, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_consumption)) %>%
+  mutate(color_group = ifelse(row_number() <= 5, "Top 5", "Others")) %>%
+  slice(1:20) 
+
+# Plot
+ggplot(fc_country, aes(x = reorder(country, total_consumption), y = total_consumption, fill = color_group)) +
+  geom_col() +
+  scale_fill_manual(values = c("Top 5" = "red", "Others" = "steelblue")) +
+  labs(
+    title = "Top 20 Countries by Total Food Consumption",
+    x = "Country",
+    y = "Total Consumption (kg/person/year)",
+    fill = NULL
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+The bar plot visualizes total food consumption across the top 20 countries and highlights the top five in red. Finland prominently leading the chart.

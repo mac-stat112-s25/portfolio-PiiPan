@@ -1,10 +1,19 @@
 ---
 title: "Univariate Viz"
+
+author: Phoebe Pan
+date: 4/24/2025
+format: 
+  html:
+    code-fold: show
+    theme: cosmo
+    toc: true
+    number-sections: true
 ---
 
 Use this file to generate a professional looking **univariate** visualization. The visualization will not perfect the first time but you are expected to improve on it throughout the semester especially after covering advanced topics such as effective viz.
 
-```{r}
+```{r setup, include=FALSE}
 # Import data
 # Used student survey data from ICA
 survey <- read.csv("https://hash-mac.github.io/stat112site-s25/data/survey.csv")

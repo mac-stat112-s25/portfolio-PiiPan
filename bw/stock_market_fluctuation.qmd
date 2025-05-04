@@ -1,17 +1,24 @@
 ---
-title: "stock market fluctuation"
-format: html
+title: "Extra Work: Stock Market Fluctuation"
+author: Phoebe Pan
+date: 4/24/2025
+format: 
+  html:
+    code-fold: show
+    theme: cosmo
+    toc: true
+    number-sections: true
 ---
 
 description:
 This section contains some extra work Phoebe did for fun. 
-\r\n
+\n
 source:
 https://www.kaggle.com/datasets/zongaobian/netflix-stock-data-and-key-affiliated-companies?resource=download
-\r\n
+\n
 https://www.kaggle.com/datasets/kirolosatef/netflex-stock-dataset-with-twitter-sentiment?select=Ntweets.xlsx
-\r\n
-```{r}
+\n
+```{r, message=FALSE,error=FALSE}
 library(tidymodels)
 library(readr)
 library(dplyr)

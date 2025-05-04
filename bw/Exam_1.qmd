@@ -1,0 +1,114 @@
+---
+title: "Exam_1"
+author: Phoebe Pan
+date: 4/24/2025
+format: html
+---
+```{r, message=FALSE,warning=FALSE,echo=FALSE}
+library(tidytuesdayR)
+library(tidyverse)
+library(ggplot2)
+library(rnaturalearth)
+library(dplyr)
+library(sf)
+```
+
+### Data
+
+**food_consumption.csv**
+
+| variable      | class     | description                       |
+|---------------|-----------|-----------------------------------|
+| country       | character | Country Name                      |
+| food_category | character | Food Category                     |
+| consumption   | double    | Consumption (kg/person/year)      |
+| co2_emmission | double    | CO2 Emission (kg CO2/person/year) |
+
+
+```{r,echo = FALSE}
+#| message: false
+#| warning: false
+tuesdata <- tt_load('2020-02-18')
+fc <- tuesdata$food_consumption
+```
+
+### Research Question
+
+What does the consumption of each food category in each country look like?
+
+
+## Understand Data
+
+```{r}
+# check the types of variables
+glimpse(fc)
+
+# check the dimensions of the data
+dim(fc)
+
+# check the first 6 rows
+head(fc)
+
+# check the statistical summary of each variable
+summary(fc)
+
+# check the column names
+colSums(is.na(fc))
+```
+
+
+
+# Answer the grand research question
+
+
+```{r fig.width=10, fig.height=10}
+# Aggregate total consumption per category globally
+fc_category <- fc %>%
+  group_by(food_category) %>%
+  summarise(
+    total_consumption = sum(consumption, na.rm = TRUE),
+    mean_consumption = mean(consumption, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_consumption))
+
+# Plot
+ggplot(fc_category, aes(x = reorder(food_category, total_consumption), y = total_consumption)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Global Total Consumption by Food Category",
+    x = "Food Category",
+    y = "Total Consumption (kg/person/year)"
+  ) +
+  theme_minimal()
+
+ggplot(fc, aes(x = food_category, y = consumption)) +
+  geom_boxplot() +
+  labs(
+    title = "Global Total Consumption by Food Category",
+    x = "Food Category",
+    y = "Total Consumption (kg/person/year)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+The firsst plot summarizes the global total consumption by aggregating across all countries for each food category. It clearly shows that milk and dairy products dominate global consumption, followed by wheat and wheat products. These two categories far exceed the others in total volume, indicating their central role in global diets. In contrast, categories like soybeans, lamb & goat, and nuts including peanut butter are consumed in much smaller quantities, suggesting they are less common or more region-specific in dietary patterns.
+
+The second plot highlights the variability in consumption levels for each food category across countries. Again, darity products and wheat products have the highest median and upper-range consumption, with one country consuming over 400 kg/person/year of dairy. The wide interquartile ranges and many outliers in categories like diary products, rice, poultry, and fish indicate significant regional differences in dietary habits. Meanwhile, foods such as lamb & goat, soybeans, and nuts show lower medians and narrower spreads, reflecting their more limited or culturally specific use.
+
+```{r fig.width=15, fig.height=8}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+fc_map_data <- left_join(world, fc, by = c("name" = "country"))
+
+ggplot(fc_map_data) +
+  geom_sf(aes(fill = consumption), color = "white", size = 0.1) +
+  scale_fill_viridis_c(option = "C", na.value = "grey90", name = "Consumption") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Consumption by Food Category"
+  ) +
+  facet_wrap(~ food_category)
+```
+The faceted choropleth maps provide a geographic view of consumption by food category. For example, milk consumption is especially high in Europe and parts of the Americas, while rice consumption is concentrated in Asia. Poultry and pork have more balanced global distributions. Categories like soybeans, nuts, and lamb & goat are consumed at low levels almost everywhere, indicating its supplemental roles. This map clearly shows how food preferences and availability vary by region.
+

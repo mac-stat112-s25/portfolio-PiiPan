@@ -1,19 +1,35 @@
 ---
 title: "Trivariate Viz"
+
+author: Phoebe Pan
+date: 4/24/2025
+format: 
+  html:
+    code-fold: show
+    theme: cosmo
+    toc: true
+    number-sections: true
 ---
 
 Use this file to generate a professional looking **trivariate** visualization.  The visualization will not perfect the first time but you are expected to improve on it throughout the semester especially after covering advanced topics such as effective viz.
 
-```{r}
+```{r setup, include=FALSE}
 library(ggplot2)
 ```
 
-```{r}
+```{r, include=FALSE}
 education <- read.csv("https://mac-stat.github.io/data/sat.csv")
 ```
 
 ```{r}
 ggplot(education,aes(x=salary,y=expend,color=sat))+
-  geom_point()
+  geom_point()+
+  labs(
+    caption = "Source: ICA",
+    title = "Relationship between estimated average annual salary of elementary school teacher , expenditure per pupil and the state-level average total SAT score",
+    x = "Estimated average annual teacher salary",
+    y = "Expenditure per pupil"
+  ) +
+  theme_minimal()
 ```
 
