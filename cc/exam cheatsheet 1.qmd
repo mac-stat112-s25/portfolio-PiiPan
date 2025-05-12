@@ -1,12 +1,12 @@
 ---
-title: "exam cheatsheet"
+title: "exam cheatsheet 1"
 format: html
 ---
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=15, out.width='100%'}
 library(magick)
 library(pdftools)
 
-pdf_images <- image_read_pdf("Intro to DS.pdf", density = 150)  
+pdf_images <- image_read_pdf("Cheatsheet 1.pdf", density = 150)  
 
 invisible(lapply(pdf_images, function(page) {
   plot(page, ann = FALSE, axes = FALSE)  

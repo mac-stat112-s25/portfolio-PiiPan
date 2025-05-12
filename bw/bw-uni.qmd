@@ -5,13 +5,15 @@ author: Phoebe Pan
 date: 4/24/2025
 format: 
   html:
-    code-fold: show
+    code-fold: true
     theme: cosmo
     toc: true
     number-sections: true
 ---
 
-Use this file to generate a professional looking **univariate** visualization. The visualization will not perfect the first time but you are expected to improve on it throughout the semester especially after covering advanced topics such as effective viz.
+This section showcases my best univariate visualizations, refined throughout the semester as I learned principles of effective design. The goal was to clearly communicate the distribution of a single variable using clean and professional plots.
+
+The data comes Student Survey, available at hash-mac.github.io/stat112site-s25/data/survey.csv, which captures Macalester students’ outdoor preferences.
 
 ```{r setup, include=FALSE}
 # Import data
@@ -22,34 +24,69 @@ library(tidyverse)
 ```
 
 ```{r}
-ggplot(survey, aes(x = hangout)) +
-  geom_bar(fill = "mediumseagreen", color = "grey") +
-  labs(
-    title = "Where Students Prefer to Hang Out Outdoors",
-    x = "Location",
-    y = "Number of Students"
-  ) +
+survey %>%
+  count(hangout) %>%
+  ggplot(aes(x = fct_reorder(hangout, n), y = n)) +
+  geom_bar(stat = "identity", fill = "seagreen") +
+  geom_text(aes(label = n), hjust = 2, vjust = -0.5) +
+  labs(x = "Location", y = "Number of Students",
+       title = "Where Students Prefer to Hang Out Outdoors") +
+  coord_flip() +
   theme_minimal()
 ```
 ```{r}
 ggplot(survey, aes(x = fav_temp_c)) +
   geom_histogram(binwidth = 2, fill = "coral", color = "white") +
+  geom_vline(aes(xintercept = mean(fav_temp_c, na.rm = TRUE)), 
+             linetype = "dashed", color = "steelblue", linewidth = 1) +
+  annotate("text", 
+           x = mean(survey$fav_temp_c, na.rm = TRUE) + 1.5, 
+           y = 8, 
+           label = "Mean", 
+           color = "steelblue", 
+           angle = 90, 
+           vjust = -0.5, 
+           size = 4) +
   labs(
     title = "Distribution of Preferred Outdoor Temperature",
     x = "Preferred Temperature (°C)",
     y = "Count"
   ) +
-  theme_minimal()
+  coord_cartesian(xlim = c(-10, 40)) +
+  theme_minimal(base_size = 14)
 ```
 
 
 ```{r}
 ggplot(survey, aes(x = fav_temp_c)) +
   geom_density(fill = "coral", alpha = 0.5) +
-  labs(title = "Density of Student Temperature Preferences",
-       x = "Preferred Temperature (°C)",
-       y = "Density") +
-  theme_minimal()
+  geom_vline(aes(xintercept = mean(fav_temp_c, na.rm = TRUE)),
+             linetype = "dashed", color = "steelblue", linewidth = 1) +
+  annotate("text",
+           x = mean(survey$fav_temp_c, na.rm = TRUE) + 0.5,
+           y = 0.055,
+           label = "Mean",
+           color = "steelblue",
+           angle = 90,
+           vjust = -0.5,
+           size = 4) +
+  geom_vline(aes(xintercept = median(fav_temp_c, na.rm = TRUE)),
+             linetype = "dotted", color = "darkgreen", linewidth = 1) +
+  annotate("text",
+           x = median(survey$fav_temp_c, na.rm = TRUE) + 3,
+           y = 0.055,
+           label = "Median",
+           color = "darkgreen",
+           angle = 90,
+           vjust = -0.5,
+           size = 4) +
+  labs(
+    title = "Density of Student Temperature Preferences",
+    x = "Preferred Temperature (°C)",
+    y = "Density"
+  ) +
+  theme_minimal(base_size = 14)
+
 ```
 
 

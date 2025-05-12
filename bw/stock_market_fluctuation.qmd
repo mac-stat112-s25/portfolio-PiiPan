@@ -1,24 +1,26 @@
 ---
 title: "Extra Work: Stock Market Fluctuation"
 author: Phoebe Pan
-date: 4/24/2025
+date: 2025-04-24
 format: 
   html:
-    code-fold: show
+    code-fold: true
     theme: cosmo
     toc: true
     number-sections: true
 ---
 
-description:
-This section contains some extra work Phoebe did for fun. 
-\n
-source:
-https://www.kaggle.com/datasets/zongaobian/netflix-stock-data-and-key-affiliated-companies?resource=download
-\n
-https://www.kaggle.com/datasets/kirolosatef/netflex-stock-dataset-with-twitter-sentiment?select=Ntweets.xlsx
-\n
-```{r, message=FALSE,error=FALSE}
+  **Description:**
+
+  This section showcases additional work Phoebe Pan completed for fun, exploring Netflix and its affiliated companies through financial and sentiment data from 2018 to 2022. The analysis combines stock price trends, rolling volatility, and Twitter sentiment to investigate how major events influenced market dynamics.
+
+  **Data sources:**
+  
+  - [Netflix Stock & Affiliates (Kaggle)](https://www.kaggle.com/datasets/zongaobian/netflix-stock-data-and-key-affiliated-companies)
+  
+  - [Twitter Sentiment Data (Kaggle)](https://www.kaggle.com/datasets/kirolosatef/netflex-stock-dataset-with-twitter-sentiment?select=Ntweets.xlsx)
+
+```{r, message=FALSE,error=FALSE,include = FALSE}
 library(tidymodels)
 library(readr)
 library(dplyr)
@@ -31,7 +33,7 @@ library(stringr)
 ```
 
 
-```{r}
+```{r,include = FALSE}
 # data imports
 
 WBD_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/WBD_daily_data.csv")
@@ -64,7 +66,8 @@ AKAM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/da
 
 data_twitter_sentiment<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/twitter sentiments/data_2018-2022.csv")
 ```
-```{r}
+
+```{r,include = FALSE}
 event_df <- tibble::tibble(
   date = as.Date(c(
     "2020-11-12",  # Sony PS5 launch
@@ -81,8 +84,7 @@ event_df <- tibble::tibble(
 )
 ```
 
-
-```{r}
+```{r,include = FALSE}
 # specify the time span
 data_twitter_sentiment %>%
   summarize(

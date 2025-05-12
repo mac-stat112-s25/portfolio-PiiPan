@@ -4,13 +4,16 @@ author: Phoebe Pan
 date: 4/24/2025
 format: 
   html:
-    code-fold: show
+    code-fold: true
     theme: cosmo
     toc: true
     number-sections: true
+    warning: false
 ---
 
-Use this file to generate a professional looking **spatial** visualization.  The visualization will not perfect the first time but you are expected to improve on it throughout the semester especially after covering advanced topics such as effective viz.
+This section showcases my best spatial visualization, created and refined over the semester as I developed a stronger understanding of geographic data representation and interactive mapping techniques. The goal was to clearly communicate spatial relationships by integrating location-based data into a visual format that highlights geographic context.
+
+The data comes from the our_fave_places.csv dataset, available at hash-mac.github.io, which includes favorite places submitted by students, along with their geographic coordinates. This dataset allowed me to build an interactive map using the leaflet package, enabling viewers to explore points of interest across the globe while reinforcing key skills in spatial data handling and visualization.
 
 ```{r, include=FALSE}
 library(leaflet)

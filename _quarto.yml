@@ -35,9 +35,10 @@ book:
       - bw/Exam_2.qmd
       - bw/stock_market_fluctuation.qmd
       
-    - part: "Cheatsheet"
+    - part: "Summary"
       chapters: 
-      - cc/exam cheatsheet.qmd
+      - cc/exam cheatsheet 1.qmd
+      - cc/exam cheatsheet 2.qmd
 
     - part: "In-class Activities"
       chapters: 

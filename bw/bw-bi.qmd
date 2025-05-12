@@ -4,13 +4,16 @@ author: Phoebe Pan
 date: 4/24/2025
 format: 
   html:
-    code-fold: show
+    code-fold: true
     theme: cosmo
     toc: true
     number-sections: true
+    warning: false
 ---
 
-Use this file to generate a professional looking **bivariate** visualization.  The visualization will not perfect the first time but you are expected to improve it throughout the semester especially after covering advanced topics such as effective viz.
+This section showcases my best bivariate visualization, developed and improved throughout the semester as I learned principles of effective data visualization and design. The goal was to clearly communicate the relationship between two variables using clean, informative, and professional plots.
+
+The data comes from two sources: the 2020 U.S. county-level election results (election_2020_county.csv) and weather data from three locations (weather_3_locations.csv), both provided through the course website at mac-stat.github.io. These datasets allow for exploration of how weather patterns may relate to regional political preferences or other contextual variables.
 
 ```{r setup, include=FALSE}
 library(ggplot2)
@@ -27,120 +30,33 @@ weather <- read.csv("https://mac-stat.github.io/data/weather_3_locations.csv")
 ```{r}
 ggplot(elections, aes(x = historical, fill = winner_20)) +
   geom_bar(position = "fill") +
-  scale_fill_manual(values = c("skyblue", "pink")) +
+  scale_fill_manual(
+    name = "2020 Winner",
+    values = c("dem" = "#5DADE2", "repub" = "#F1948A"),
+    labels = c("Democrat", "Republican")
+  ) +
   labs(
-    caption = "Source: ICA",
-    title = "Proportion of 2020 Winners by Historical State Voting Pattern",
+    title = "2020 Election Outcomes by Historical State Voting Patterns",
     x = "Historical Voting Trend",
     y = "Proportion of Counties",
-    fill = "2020 Winner"
+    caption = "Source: ICA"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 14)
+
 ```
 ```{r}
 ggplot(weather, aes(x = temp3pm, fill = location)) +
   geom_density(alpha = 0.5) +
+  scale_fill_brewer(palette = "Set2") +
   labs(
-    caption = "Source: ICA",
     title = "Distribution of 3PM Temperatures by Location",
     x = "Temperature at 3PM (°C)",
     y = "Density",
-    fill = "Location"
+    fill = "Location",
+    caption = "Source: ICA"
   ) +
-  theme_minimal()
-
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top")
 ```
 
-```{r echo = FALSE,warning=FALSE, error=FALSE, message=FALSE}
-# data imports
-
-WBD_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/WBD_daily_data.csv")
-
-V_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/V_daily_data.csv")
-
-UPS_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/UPS_daily_data.csv")
-
-SONY_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/SONY_daily_data.csv")
-
-PARA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/PARA_daily_data.csv")
-
-NVDA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/NVDA_daily_data.csv")
-
-NFLX_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/NFLX_daily_data.csv")
-
-MA_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/MA_daily_data.csv")
-
-LUMN_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/LUMN_daily_data.csv")
-
-INTC_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/INTC_daily_data.csv")
-
-FDX_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/FDX_daily_data.csv")
-
-CRM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/CRM_daily_data.csv")
-
-AMZN_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/AMZN_daily_data.csv")
-
-AKAM_stock<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/affiliated companies/AKAM_daily_data.csv")
-
-data_twitter_sentiment<-read_csv("/Users/piipan/Documents/GitHub/comp112/portfolio-PiiPan/data/ds solo project/twitter sentiments/data_2018-2022.csv")
-# data cleaning: adjust time span
-filter_stock_data <- function(data) {
-    data %>% 
-    mutate(Date = as.Date(Date)) %>%
-    filter(Date >= as.Date("2018-01-02") & Date <= as.Date("2022-07-08"))
-}
-
-WBD_stock  <- filter_stock_data(WBD_stock)
-V_stock    <- filter_stock_data(V_stock)
-UPS_stock  <- filter_stock_data(UPS_stock)
-SONY_stock <- filter_stock_data(SONY_stock)
-PARA_stock <- filter_stock_data(PARA_stock)
-NVDA_stock <- filter_stock_data(NVDA_stock)
-NFLX_stock <- filter_stock_data(NFLX_stock)
-MA_stock   <- filter_stock_data(MA_stock)
-LUMN_stock <- filter_stock_data(LUMN_stock)
-INTC_stock <- filter_stock_data(INTC_stock)
-FDX_stock  <- filter_stock_data(FDX_stock)
-CRM_stock  <- filter_stock_data(CRM_stock)
-AMZN_stock <- filter_stock_data(AMZN_stock)
-AKAM_stock <- filter_stock_data(AKAM_stock)
-# data cleaning: combine the stock data
-normalize_and_label <- function(df, ticker) {
-  df %>%
-    mutate(
-      Date = as.Date(Date),
-      normalized = `Adj Close` / first(`Adj Close`),
-      symbol = ticker
-    )
-}
-
-all_stocks <- bind_rows(
-  normalize_and_label(WBD_stock,  "WBD"),
-  normalize_and_label(V_stock,    "V"),
-  normalize_and_label(UPS_stock,  "UPS"),
-  normalize_and_label(SONY_stock, "SONY"),
-  normalize_and_label(PARA_stock, "PARA"),
-  normalize_and_label(NVDA_stock, "NVDA"),
-  normalize_and_label(NFLX_stock, "NFLX"),
-  normalize_and_label(MA_stock,   "MA"),
-  normalize_and_label(LUMN_stock, "LUMN"),
-  normalize_and_label(INTC_stock, "INTC"),
-  normalize_and_label(FDX_stock,  "FDX"),
-  normalize_and_label(CRM_stock,  "CRM"),
-  normalize_and_label(AMZN_stock, "AMZN"),
-  normalize_and_label(AKAM_stock, "AKAM")
-)
-```
-
-
-```{r,warning=FALSE, error=FALSE, message=FALSE}
-ggplot(all_stocks, aes(x = Date, y = normalized, color = symbol)) +
-  geom_line(size = 0.4) +
-  labs(title = "Normalized Stock Price Trends",
-       subtitle = "Netflix & Affiliated Companies from 2018 to 2022",
-       caption = "Source: Yahoo Finance",
-       y = "Normalized Price",
-       x = "Date") +
-  theme_minimal()
-```
 
