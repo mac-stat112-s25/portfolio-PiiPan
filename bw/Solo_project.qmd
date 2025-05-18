@@ -1,6 +1,14 @@
 ---
 title: "Mapping the Museums of the United Kingdom"
-format: html
+format: 
+  html:
+    toc: true
+    number-sections: true
+    code-tools: true    
+    code-fold: true     
+    warning: false
+    echo: true
+    message: false
 ---
 
 ## Intro
@@ -16,7 +24,12 @@ Through this analysis, I hope to contribute to a better understanding of the cul
 For this analysis, I’m using data from the TidyTuesday project in 2022 (https://github.com/rfordatascience/tidytuesday/tree/main/data/2022/2022-11-22), which is sourced from Museums UK, providing details on thousands of museums, their locations, categories, and governance.
 
 ```{r}
-# Load required packages
+#| label: load-packages
+#| code-summary: Load Packages
+#| echo: true
+#| message: false
+#| warning: false
+
 library(tidyverse)
 library(sf)
 library(ggplot2)
@@ -24,19 +37,39 @@ library(maps)
 library(rnaturalearth)
 library(RColorBrewer)
 library(mosaic)
+library(knitr)
+library(kableExtra)
 ```
 
 ```{r}
-# Import data
+#| label: Data-Imports
+#| code-summary: Data Imports
+#| echo: true
+#| message: false
+#| warning: false
 museums <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2022/2022-11-22/museums.csv") 
 ```
+
 Let's take a quick look at the data, it includes 35 variables -- we may want to clean the data to keep the tidiness.
 ```{r}
-# Inspect data
-head(museums)
+#| label: Data-Exploration
+#| code-summary: Data Exploration
+#| echo: true
+#| message: false
+#| warning: false
+head(museums) %>%
+  kable(format = "html", caption = "Table: First 6 Rows of Museums Dataset") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                full_width = FALSE, position = "center")
 ```
+
 ```{r}
-# data cleaning
+#| label: Data-Cleaning
+#| code-summary: Data Cleaning
+#| echo: true
+#| message: false
+#| warning: false
+
 museums_clean <- museums %>% 
   select(Name_of_museum,Latitude,Longitude,Admin_area, Accreditation,Governance,Size,Subject_Matter,Year_closed) %>% # keep only useful variables
   filter(Year_closed == "9999:9999") %>% # only look at the open museums
@@ -47,7 +80,12 @@ museums_clean <- museums %>%
 ```
 
 ```{r}
-# prpare the map background
+#| label: Prepare-Map
+#| code-summary: Prepare the Map Background
+#| echo: true
+#| message: false
+#| warning: false
+
 uk_countries <- ne_states(country = "United Kingdom", returnclass = "sf")
 ```
 
@@ -55,11 +93,19 @@ uk_countries <- ne_states(country = "United Kingdom", returnclass = "sf")
 
 ## Analysis
 ```{r}
+#| label: uk-museum-size-distribution
+#| code-summary: "Bar Charts of Museum Size by Country and Country by Size"
+#| echo: true
+#| message: false
+#| warning: false
+
+# Plot 1: Number of museums by country, filled by Size
 ggplot(museums_clean, aes(x = country, fill = Size)) +
   geom_bar()  +
   labs(x = "UK Country", y = "Count") +
   theme_minimal()
 
+# Plot 2: Proportion of museum sizes within each country
 ggplot(museums_clean , aes(x = Size, fill = country)) +
   geom_bar(position = "fill") +
   labs(x = "Museum Size", y = "Count") +
@@ -68,6 +114,12 @@ ggplot(museums_clean , aes(x = Size, fill = country)) +
 From the 2 plots above, we can observe that most UK museums are located in England, which has by far the largest number of museums in every size category. Scotland has the second highest count, followed by Wales and Northern Ireland, with the Channel Islands and Isle of Man having very few. Across all countries, small museums are the most common, while “huge” museums are rare everywhere.
 
 ```{r}
+#| label: uk-museum-map
+#| code-summary: "Map of UK Museums Colored by Size"
+#| echo: true
+#| message: false
+#| warning: false
+
 ggplot() +
   geom_sf(data = uk_countries, fill = "gray95", color = "gray70") +
   geom_point(
@@ -82,6 +134,12 @@ The map confirms our understanding about distribution of museums of different si
 
 
 ```{r}
+#| label: uk-museum-map-gov
+#| code-summary: "Map of UK Museums Colored by Governance Category"
+#| echo: true
+#| message: false
+#| warning: false
+
 ggplot() +
   geom_sf(data = uk_countries, fill = "gray95", color = "gray70") +
   geom_point(
@@ -95,6 +153,12 @@ ggplot() +
 We can see that the independent governance dominates the UK museum landscape, with government museums making up much smaller shares. Museums are most densely clustered in southern England but are spread across the country, including remote regions. In the following steps we would analyze the museum's governance composition combining with the subgroups with bar plot. 
 
 ```{r}
+#| label: museum-gov-distribution
+#| code-summary: "Bar Charts of Museum Governance Categories"
+#| echo: true
+#| message: false
+#| warning: false
+
 ggplot(museums_clean, aes(x = gov_cat, fill = Governance)) +
   geom_bar() +
   theme_minimal()
@@ -123,6 +187,12 @@ Meanwhile, both bar charts show that “Independent-Not_for_profit” and “Ind
 Now, let's focus on the most common governance types and the size composition within each type.
 
 ```{r}
+#| label: governance-size-breakdown
+#| code-summary: "Museum Size Distribution by Governance Type"
+#| echo: true
+#| message: false
+#| warning: false
+
 ggplot(museums_clean %>% filter(Governance %in% c("Independent-National_Trust", "Independent-Private","Government-Local_Authority","Independent-Not_for_profit")), aes(x = Governance, fill = Size)) +
   geom_bar() +
   theme_minimal() +
